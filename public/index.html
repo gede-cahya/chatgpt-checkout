@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT Checkout Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+            <path d="M12 18V6"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Checkout Generator</h1>
+          <p class="subtitle">ChatGPT Plus / Pro — Free Trial IDR ¥0</p>
+        </div>
+      </div>
+      <div class="status-badge" id="statusBadge">
+        <span class="status-dot"></span>
+        <span id="statusText">Ready</span>
+      </div>
+    </header>
+
+    <main class="main-card">
+      <!-- Mode selector -->
+      <section class="mode-section">
+        <div class="mode-toggle">
+          <label class="mode-option">
+            <input type="radio" name="mode" value="external" checked>
+            <div class="mode-card">
+              <span class="mode-icon">⚡</span>
+              <span class="mode-name">Auto Generate</span>
+              <span class="mode-desc">Pakai server Jepang (recommended)</span>
+            </div>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="proxy">
+            <div class="mode-card">
+              <span class="mode-icon">🔧</span>
+              <span class="mode-name">Manual Proxy</span>
+              <span class="mode-desc">Pakai proxy sendiri</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Proxy Settings (hidden by default) -->
+      <section class="proxy-section" id="proxySection" style="display:none">
+        <details id="proxyDetails" open>
+          <summary class="proxy-toggle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-13.5-5.2 3m-6.92 4-5.2 3M22.66 17.5l-5.2-3m-6.92-4-5.2-3"/></svg>
+            🇯🇵 Proxy Settings
+          </summary>
+          <div class="proxy-content">
+            <p class="proxy-hint">Format: <code>http://user:pass@ip:port</code> atau <code>socks5://ip:port</code></p>
+            <div class="proxy-input-row">
+              <input type="text" id="proxyInput" value="http://szksneze:s0cnfzh60f4b@142.111.67.146:5611" spellcheck="false">
+              <button class="btn-check-ip" onclick="checkIP()">Check IP</button>
+            </div>
+            <div class="ip-result" id="ipResult" style="display:none"></div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Input Section -->
+      <section class="input-section">
+        <div class="section-header">
+          <div class="step-badge">1</div>
+          <div>
+            <h2>Paste Session Data</h2>
+            <p>Tempel <strong>seluruh JSON</strong> dari <code>chatgpt.com/api/auth/session</code></p>
+          </div>
+        </div>
+        <div class="input-wrapper">
+          <textarea id="sessionInput" placeholder='{"WARNING_BANNER":"...", "user":{...}, "accessToken":"eyJ...", ...}' spellcheck="false"></textarea>
+          <div class="input-actions">
+            <button class="btn-icon" onclick="pasteFromClipboard()" title="Paste">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            </button>
+            <button class="btn-icon" onclick="clearInput()" title="Clear">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Country selector -->
+        <div class="country-selector">
+          <label class="country-option">
+            <input type="radio" name="country" value="ID" checked>
+            <div class="country-card">
+              <span>🇮🇩</span>
+              <span>IDR (Indonesia)</span>
+            </div>
+          </label>
+          <label class="country-option">
+            <input type="radio" name="country" value="JP">
+            <div class="country-card">
+              <span>🇯🇵</span>
+              <span>JPY (Jepang)</span>
+            </div>
+          </label>
+        </div>
+
+        <button class="btn-primary" id="generateBtn" onclick="generate()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>
+          <span>Generate Checkout Link</span>
+        </button>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- Results -->
+      <section class="results-section" id="resultsSection" style="display:none">
+        <!-- Promo Status -->
+        <div class="promo-status" id="promoStatus" style="display:none">
+          <div class="promo-tag" id="promoTag"></div>
+        </div>
+
+        <!-- Account Info -->
+        <div class="result-block" id="accountBlock" style="display:none">
+          <div class="section-header">
+            <div class="step-badge success">✓</div>
+            <div>
+              <h2>Account Info</h2>
+              <p id="accountSummary">—</p>
+            </div>
+          </div>
+          <div class="account-cards" id="accountCards"></div>
+        </div>
+
+        <!-- Checkout Link -->
+        <div class="result-block" id="checkoutBlock" style="display:none">
+          <div class="section-header">
+            <div class="step-badge glow">2</div>
+            <h2>Checkout Link</h2>
+          </div>
+          <div class="checkout-links" id="checkoutLinks"></div>
+        </div>
+
+        <!-- Debug log -->
+        <details class="raw-logs">
+          <summary>🔧 Debug Log</summary>
+          <pre id="rawLog"></pre>
+        </details>
+      </section>
+
+      <div class="loading-overlay" id="loadingOverlay" style="display:none">
+        <div class="spinner"></div>
+        <p id="loadingText">Menghubungi API ChatGPT...</p>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>⚠️ Tool ini hanya untuk penggunaan pribadi. Jangan bagikan token Anda.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
