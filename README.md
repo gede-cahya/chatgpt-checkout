@@ -20,7 +20,7 @@ Pastikan komputer Anda sudah terinstall:
 
 1. **Clone repository ini** (atau download/extract source codenya):
    ```bash
-   git clone https://github.com/cahya/chatgpt-checkout.git
+   git clone https://github.com/gede-cahya/chatgpt-checkout.git
    cd chatgpt-checkout
    ```
    *(Sesuaikan link repository dengan akun GitHub Anda)*
